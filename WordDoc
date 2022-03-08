@@ -1,0 +1,116 @@
+Brainstorming
+-users can sign into the app with their email and password
+-users can create recipes with ingredients and instructions
+-recipes can be marked as public or private
+-users can view other people’s recipes
+-ingredients from recipes can be added to user’s grocery lists
+-users can create their own occasions and assign recipes to occasions
+
+Table Ideas
+-User (id, username, first_name, last_name, profile_pic)
+-Authorization (user_id, email, password)
+-Recipe (id, user_id, name, ingredients, instructions, is_private)
+-Ingredient (id, name)
+-GroceryList (id, ingredient_id, name)
+-Occasion (id, recipe_id, name)
+
+Relationships
+One-to-one
+User to Authorization: Each user should have one authorization, this will separate public/private data
+One-to-many
+User to Recipe: One user can create/view many recipes
+User to GroceryList: One user can create many grocery lists
+User to Occasion: One user can create many occasions
+Many-to-many
+Recipe to Occasion: Many recipes can be assigned to many occasions
+Ingredient to GroceryList: Many ingredients can be assigned to many grocery lists
+Ingredient to Recipe: Many ingredients can be assigned to many recipes
+
+Columns
+User, Recipe, Occasion, GroceryList, Ingredient, RecipeOccasion, IngredientRecipe, IngredientGroceryList:
+-id: PRIMARY INTEGER that uniquely identifies each table item
+Authorization, Recipe, Occasion, GroceryList
+-user_id: FOREIGN INTEGER that associates each table item with a unique user
+Recipe, Occasion, GroceryList, Ingredient
+-name: VARCHAR that gives table item a name
+User
+-username: VARCHAR that lets user publicly identify themselves
+-first_name: VARCHAR that lets users share first name
+-last_name: VARCHAR that lets users share last name
+-profile-pic: TEXT that allows users to share a profile picture, accounting for lengthy URLs
+Authorization:
+-email: VARCHAR that privately holds user email
+-password: VARCHAR that privately holds user password
+Recipe
+-instructions: TEXT that allows users to provide instructions for creating a recipe, accounting for lengthy recipes
+-is_private: BOOLEAN that allows users to mark their recipes as public or private
+RecipeOccasion
+-recipe_id: FOREIGN INTEGER that associates each table item with a unique recipe
+-occasion_id: FOREIGN INTEGER that associates each table item with a unique occasion
+IngredientRecipe
+-ingredient_id: FOREIGN INTEGER that associates each table item with a unique ingredient
+-recipe_id: FOREIGN INTEGER that associates each table item with a unique recipe
+IngredientGroceryList
+-ingredient_id: FOREIGN INTEGER that associates each table item with a unique ingredient
+-grocery_list_id: FOREIGN INTEGER that associates each table item with a unique grocery list
+
+
+
+SQL:
+create table User (
+   id SERIAL PRIMARY KEY,
+   username UNIQUE VARCHAR(255),
+   first_name VARCHAR(255),
+   last_name VARCHAR(255),
+   profile_pic TEXT
+);
+ 
+create table Authorization (
+   FOREIGN KEY user_id REFERENCES User(id),
+   email UNIQUE VARCHAR(255),
+   password VARCHAR(255)
+);
+ 
+create table Recipe (
+   id SERIAL PRIMARY KEY,
+   FOREIGN KEY user_id REFERENCES User(id),
+   name VARCHAR(255),
+   instructions TEXT,
+   is_private BOOLEAN
+);
+ 
+create table Occasion (
+   id SERIAL PRIMARY KEY,
+   FOREIGN KEY user_id REFERENCES User(id),
+   name VARCHAR(255)
+);
+ 
+create table GroceryList (
+   id SERIAL PRIMARY KEY,
+   FOREIGN KEY user_id REFERENCES User(id),
+   name VARCHAR(255)
+);
+ 
+create table Ingredient (
+   id SERIAL PRIMARY KEY,
+   name VARCHAR(255)
+);
+ 
+create table RecipeOccasion (
+   id SERIAL PRIMARY KEY,
+   FOREIGN KEY recipe_id REFERENCES Recipe(id),
+   FOREIGN KEY occasion_id REFERENCES Occasion(id)
+);
+ 
+create table IngredientRecipe (
+   id SERIAL PRIMARY KEY,
+   FOREIGN KEY ingredient_id REFERENCES Ingredient(id),
+   FOREIGN KEY recipe_id REFERENCES Recipe(id)
+);
+ 
+create table IngredientGroceryList (
+   id SERIAL PRIMARY KEY,
+   FOREIGN KEY ingredient_id REFERENCES Ingredient(id),
+   FOREIGN KEY grocery_list_id REFERENCES GroceryList(id)
+);
+
